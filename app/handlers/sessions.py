@@ -37,32 +37,26 @@ SESSIONS = {
 
     "second_session": {
         "title": "💻 سیری در جهان کامپیوتر | فصل دوم، جلسه دوم",
-        "text": """💻 **سیری در جهان کامپیوتر | فصل دوم، جلسه دوم**
+        "text": """🟢 دنیای امروز بیش از هر زمان دیگری به شبکه‌ها و فناوری‌های دیجیتال وابسته شده؛ اما چقدر با چالش‌های امنیتی این دنیای به‌هم‌پیوسته آشنایی داریم؟
 
-🟢 دنیای امروز بیش از هر زمان دیگری به شبکه‌ها و فناوری‌های دیجیتال وابسته شده؛ اما چقدر با چالش‌های امنیتی این دنیای به‌هم‌پیوسته آشنایی داریم؟ امنیت سایبری در دنیای واقعی چه جایگاهی دارد و فناوری چگونه می‌تواند مسیر پیشرفت و تحول صنایع را تغییر دهد؟
+🔵 در دومین جلسه از فصل دوم مجموعه‌نشست‌های «سیری در جهان کامپیوتر»، میزبان یکی از اساتید حوزه مهندسی کامپیوتر با تخصص در شبکه‌های کامپیوتری و امنیت سایبری هستیم تا درباره امنیت شبکه، تجربه‌های صنعتی، تحول دیجیتال و فناوری‌های نوظهور گفت‌وگو کنیم.
 
-🔵 در دومین جلسه از فصل دوم مجموعه‌نشست‌های «سیری در جهان کامپیوتر»، میزبان یکی از اساتید حوزه مهندسی کامپیوتر با تخصص در شبکه‌های کامپیوتری و امنیت سایبری هستیم تا در فضایی صمیمی و تعاملی، درباره دنیای امنیت شبکه، تجربه‌های صنعتی، تحول دیجیتال و نقش فناوری‌های نوظهور در کسب‌وکارها و صنایع گفت‌وگو کنیم.
+🟢 فرصتی برای آشنایی با چالش‌های واقعی امنیت سایبری، شنیدن تجربه‌های صنعتی و پرسیدن سؤالات درباره مسیر فعالیت در این حوزه.
 
-🟢 این نشست فرصتی است تا فراتر از مباحث تئوری کلاس‌های درس، با چالش‌های واقعی امنیت در صنعت آشنا شویم، از تجربه‌های اجرایی و مشاوره‌ای مهمان نشست بشنویم و درباره فرصت‌ها و مسیرهای فعالیت در حوزه امنیت سایبری و فناوری اطلاعات سؤال کنیم.
-
-✨ اگر به دنیای شبکه، امنیت سایبری و کاربرد فناوری در دنیای واقعی علاقه‌مندی، این گفت‌وگو می‌تونه دریچه تازه‌ای به رویت باز کنه!
-
-📝 برای تکمیل ثبت‌نام، مراحل بعدی ربات رو دنبال کن و اطلاعات درخواستی رو وارد کن.
 📅 تاریخ برگزاری: پنجشنبه، ۲۳ مهر
 ⏰ ساعت: ۱۰ تا ۱۱:۳۰
 📍 مکان: دانشگاه یزد، دانشکده منابع طبیعی، سالن منتظر قائم
 💰 هزینه شرکت: رایگان
 
-📝 برای تکمیل ثبت‌نام، مراحل بعدی ربات رو دنبال کن و اطلاعات درخواستی رو وارد کن.""",
+📝 برای ثبت‌نام، مراحل بعدی ربات را دنبال کنید.""",
         "poster": "second_session.jpg",
         "registration_open": True,
     },
 }
 
 
-# مسیر پوشه تصاویر
+# مسیر پوشه تصاویر: app/assets/
 ASSETS_PATH = Path(__file__).resolve().parents[1] / "assets"
-
 
 DEGREES = [
     "کاردانی",
@@ -85,14 +79,13 @@ UNIVERSITIES = [
     "سایر",
 ]
 
-
 selected_sessions = {}
 registration_data = {}
 
 
 def register_sessions_handler(bot: TeleBot):
 
-    # نمایش نشست‌های علمی
+    # نمایش فهرست نشست‌های علمی
     @bot.message_handler(
         func=lambda message: (
             message.text is not None
@@ -110,8 +103,10 @@ def register_sessions_handler(bot: TeleBot):
     @bot.message_handler(
         func=lambda message: (
             message.text is not None
-            and message.text.strip()
-            in {session["title"] for session in SESSIONS.values()}
+            and message.text.strip() in {
+                session["title"].strip()
+                for session in SESSIONS.values()
+            }
         )
     )
     def show_session_details(message):
@@ -122,10 +117,13 @@ def register_sessions_handler(bot: TeleBot):
             (
                 key
                 for key, session in SESSIONS.items()
-                if session["title"] == selected_title
+                if session["title"].strip() == selected_title
             ),
             None,
         )
+
+        print(f"[SESSIONS] selected_title={selected_title!r}")
+        print(f"[SESSIONS] selected_session_id={session_id!r}")
 
         if session_id is None:
             bot.send_message(
@@ -137,24 +135,32 @@ def register_sessions_handler(bot: TeleBot):
 
         selected_sessions[user_id] = session_id
         session = SESSIONS[session_id]
-
-        # انتخاب پوستر متناسب با نشست
         poster_path = ASSETS_PATH / session["poster"]
 
+        print(f"[SESSIONS] poster_path={poster_path}")
+        print(f"[SESSIONS] poster_exists={poster_path.is_file()}")
+
+        # ارسال پوستر
         if poster_path.is_file():
             try:
-                with open(poster_path, "rb") as poster:
+                with poster_path.open("rb") as poster:
                     bot.send_photo(
                         message.chat.id,
                         poster,
-                        caption=session["text"],
-                        reply_markup=session_details_menu(),
+                        caption=session["title"],
                     )
-                return
-            except Exception as e:
-                print(f"خطا در ارسال پوستر: {e}")
+            except Exception as error:
+                print(
+                    f"[SESSIONS] photo_send_error "
+                    f"session_id={session_id}: {error}"
+                )
+        else:
+            print(
+                f"[SESSIONS] poster_not_found "
+                f"session_id={session_id}, path={poster_path}"
+            )
 
-        # در صورت نبودن پوستر، فقط متن ارسال می‌شود
+        # ارسال متن در پیام جداگانه
         bot.send_message(
             message.chat.id,
             session["text"],
@@ -170,6 +176,7 @@ def register_sessions_handler(bot: TeleBot):
     )
     def back_to_main(message):
         user_id = message.from_user.id
+
         selected_sessions.pop(user_id, None)
         registration_data.pop(user_id, None)
 
@@ -188,6 +195,7 @@ def register_sessions_handler(bot: TeleBot):
     )
     def back_to_sessions(message):
         user_id = message.from_user.id
+
         selected_sessions.pop(user_id, None)
         registration_data.pop(user_id, None)
 
@@ -216,9 +224,9 @@ def register_sessions_handler(bot: TeleBot):
             )
             return
 
-        # بررسی وضعیت ثبت‌نام نشست
         session = SESSIONS[session_id]
 
+        # بررسی باز یا بسته بودن ثبت‌نام
         if not session.get("registration_open", True):
             bot.send_message(
                 message.chat.id,
@@ -233,7 +241,7 @@ def register_sessions_handler(bot: TeleBot):
             return
 
         registration_data[user_id] = {
-            "session_id": session_id,
+            "session_id": session_id
         }
 
         bot.send_message(
@@ -261,6 +269,7 @@ def register_sessions_handler(bot: TeleBot):
                 "لطفاً نام و نام خانوادگی خود را وارد کنید.",
                 reply_markup=session_cancel_menu(),
             )
+
             bot.register_next_step_handler(
                 message,
                 get_name,
@@ -295,6 +304,7 @@ def register_sessions_handler(bot: TeleBot):
                 "لطفاً از دکمه «📱 ارسال شماره تلفن» استفاده کنید.",
                 reply_markup=session_phone_menu(),
             )
+
             bot.register_next_step_handler(
                 message,
                 get_phone,
@@ -311,6 +321,7 @@ def register_sessions_handler(bot: TeleBot):
                 "لطفاً شماره تلفن خودتان را ارسال کنید.",
                 reply_markup=session_phone_menu(),
             )
+
             bot.register_next_step_handler(
                 message,
                 get_phone,
@@ -349,6 +360,7 @@ def register_sessions_handler(bot: TeleBot):
                 "لطفاً مقطع تحصیلی خود را از گزینه‌ها انتخاب کنید.",
                 reply_markup=session_degree_menu(),
             )
+
             bot.register_next_step_handler(
                 message,
                 get_degree,
@@ -385,6 +397,7 @@ def register_sessions_handler(bot: TeleBot):
                 "لطفاً سال ورودی خود را از گزینه‌ها انتخاب کنید.",
                 reply_markup=session_entry_year_menu(),
             )
+
             bot.register_next_step_handler(
                 message,
                 get_entry_year,
@@ -421,6 +434,7 @@ def register_sessions_handler(bot: TeleBot):
                 "لطفاً دانشگاه خود را از گزینه‌ها انتخاب کنید.",
                 reply_markup=session_university_menu(),
             )
+
             bot.register_next_step_handler(
                 message,
                 get_university,
@@ -434,6 +448,7 @@ def register_sessions_handler(bot: TeleBot):
                 "لطفاً نام دانشگاه خود را وارد کنید:",
                 reply_markup=session_cancel_menu(),
             )
+
             bot.register_next_step_handler(
                 message,
                 get_other_university,
@@ -442,7 +457,11 @@ def register_sessions_handler(bot: TeleBot):
             return
 
         registration_data[user_id]["university"] = university
-        send_registration_to_admin(message, session_id)
+
+        send_registration_to_admin(
+            message,
+            session_id,
+        )
 
     # دریافت نام دانشگاه در صورت انتخاب «سایر»
     def get_other_university(message, session_id):
@@ -457,6 +476,7 @@ def register_sessions_handler(bot: TeleBot):
                 "لطفاً نام دانشگاه خود را وارد کنید.",
                 reply_markup=session_cancel_menu(),
             )
+
             bot.register_next_step_handler(
                 message,
                 get_other_university,
@@ -464,13 +484,20 @@ def register_sessions_handler(bot: TeleBot):
             )
             return
 
-        registration_data[user_id]["university"] = message.text.strip()
-        send_registration_to_admin(message, session_id)
+        registration_data[user_id]["university"] = (
+            message.text.strip()
+        )
+
+        send_registration_to_admin(
+            message,
+            session_id,
+        )
 
     # ارسال اطلاعات ثبت‌نام برای ادمین
     def send_registration_to_admin(message, session_id):
         user_id = message.from_user.id
         user = message.from_user
+
         data = registration_data.get(user_id)
 
         if not data:
@@ -482,7 +509,12 @@ def register_sessions_handler(bot: TeleBot):
             return
 
         session = SESSIONS[session_id]
-        username = f"@{user.username}" if user.username else "ندارد"
+
+        username = (
+            f"@{user.username}"
+            if user.username
+            else "ندارد"
+        )
 
         admin_message = (
             "🎙️ ثبت‌نام جدید در نشست علمی\n\n"
@@ -500,16 +532,22 @@ def register_sessions_handler(bot: TeleBot):
             if not ADMIN_ID:
                 raise ValueError("ADMIN_ID تنظیم نشده است.")
 
-            bot.send_message(ADMIN_ID, admin_message)
+            bot.send_message(
+                ADMIN_ID,
+                admin_message,
+            )
 
-        except Exception as e:
-            print(f"خطا در ارسال اطلاعات ثبت‌نام: {e}")
+        except Exception as error:
+            print(
+                f"خطا در ارسال اطلاعات ثبت‌نام: {error}"
+            )
 
             bot.send_message(
                 message.chat.id,
                 "❌ ثبت‌نام انجام نشد. لطفاً بعداً دوباره تلاش کنید.",
                 reply_markup=main_menu(),
             )
+
             registration_data.pop(user_id, None)
             selected_sessions.pop(user_id, None)
             return
@@ -536,6 +574,7 @@ def register_sessions_handler(bot: TeleBot):
                 "ثبت‌نام لغو شد.",
                 reply_markup=main_menu(),
             )
+
             return True
 
         return False
