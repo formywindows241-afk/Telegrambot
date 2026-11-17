@@ -1,3 +1,4 @@
+
 from pathlib import Path
 
 from telebot import TeleBot
@@ -32,6 +33,7 @@ SESSIONS = {
 
         "poster": "first_session.jpg",
         "registration_open": False,
+        "report_url": "https://t.me/yazd_ce_pm/1096",
     },
 
     "second_session": {
@@ -49,12 +51,34 @@ SESSIONS = {
 💰 شرکت در نشست رایگان است.""",
 
         "poster": "second_session.jpg",
+        "registration_open": False,
+        "report_url": "https://t.me/yazd_ce_pm/1134",
+    },
+
+    "third_session": {
+        "title": "💻 سیری در جهان کامپیوتر | فصل دوم، جلسه سوم",
+
+        "text": """🟢 دنیای مهندسی نرم‌افزار پر از ایده‌هایی است که می‌تونن به محصولات و راهکارهای کاربردی تبدیل بشن؛ اما مسیر تبدیل یک ایده به محصول واقعی چطوریه؟
+
+🔵 در سومین جلسه از فصل دوم مجموعه‌نشست‌های «سیری در جهان کامپیوتر»، میزبان دکتر فرزاد نیازمند، مهندس نرم‌افزار، مدیر ارشد فنی و هم‌بنیان‌گذار شرکت امید نیک هستیم.
+
+🟢 در این نشست درباره تجربه‌های صنعتی، مدیریت تیم‌های توسعه نرم‌افزاری و مسیر تبدیل ایده‌ها به محصولات واقعی گفت‌وگو خواهیم کرد.
+
+📅 پنجشنبه، ۲۸ آبان ۱۴۰۵
+⏰ ساعت ۱۰ تا ۱۲
+📍 دانشگاه یزد، دانشکده منابع طبیعی، سالن دکتر جزیره‌ای
+
+💰 شرکت در نشست رایگان است.""",
+
+        "poster": "Third_session.jpg",
         "registration_open": True,
+        "report_url": None,
     },
 }
 
 
 ASSETS_PATH = Path(__file__).resolve().parents[1] / "assets"
+
 
 DEGREES = [
     "کاردانی",
@@ -76,6 +100,7 @@ UNIVERSITIES = [
     "دانشگاه علم و هنر",
     "سایر",
 ]
+
 
 selected_sessions = {}
 registration_data = {}
@@ -228,17 +253,28 @@ def register_sessions_handler(bot: TeleBot):
 
         session = SESSIONS[session_id]
 
+        # بررسی وضعیت ثبت‌نام
         if not session["registration_open"]:
-            bot.send_message(
-                message.chat.id,
-                (
-                    'این رویداد قبلاً برگزار شده و از '
-                    '<a href="https://t.me/yazd_ce_pm/1096">'
-                    'اینجا</a> می‌تونی گزارش تصویریشو ببینی 😉'
-                ),
-                parse_mode="HTML",
-                reply_markup=session_details_menu(),
-            )
+            report_url = session.get("report_url")
+
+            if report_url:
+                bot.send_message(
+                    message.chat.id,
+                    (
+                        'این رویداد قبلاً برگزار شده و از '
+                        f'<a href="{report_url}">'
+                        'اینجا</a> می‌تونی گزارش تصویریشو ببینی 😉'
+                    ),
+                    parse_mode="HTML",
+                    reply_markup=session_details_menu(),
+                )
+            else:
+                bot.send_message(
+                    message.chat.id,
+                    "ثبت‌نام این نشست بسته شده است.",
+                    reply_markup=session_details_menu(),
+                )
+
             return
 
         registration_data[user_id] = {
