@@ -2,7 +2,6 @@
 from telebot.types import ReplyKeyboardMarkup, KeyboardButton
 
 
-# منوی اصلی کارگاه ها
 def workshops_menu():
 
     keyboard = ReplyKeyboardMarkup(resize_keyboard=True)
@@ -18,23 +17,21 @@ def workshops_menu():
     return keyboard
 
 
-# منوی اختصاصی بوتکمپ
 def workshop_registration_menu():
 
     keyboard = ReplyKeyboardMarkup(resize_keyboard=True)
 
     keyboard.row(
-        KeyboardButton("📝 ثبت‌نام")
+        KeyboardButton("📝 پیش‌ثبت‌نام بوتکمپ")
     )
 
     keyboard.row(
-        KeyboardButton("🔙 بازگشت به فهرست دوره‌ها")
+        KeyboardButton("🔙 بازگشت به فهرست کارگاه‌ها")
     )
 
     return keyboard
 
 
-# منوی انصراف
 def workshop_cancel_menu():
 
     keyboard = ReplyKeyboardMarkup(resize_keyboard=True)
@@ -46,7 +43,6 @@ def workshop_cancel_menu():
     return keyboard
 
 
-# منوی دریافت شماره تماس
 def workshop_contact_menu():
 
     keyboard = ReplyKeyboardMarkup(resize_keyboard=True)
@@ -65,7 +61,6 @@ def workshop_contact_menu():
     return keyboard
 
 
-# منوی انتخاب دانشگاه
 def workshop_university_menu():
 
     keyboard = ReplyKeyboardMarkup(resize_keyboard=True)
