@@ -20,7 +20,7 @@ from app.keyboards.workshops_menu import (
 
 def register_workshops_handler(bot: TeleBot):
 
-    # نگهداری اطلاعات موقت ثبت نام کاربران
+    # اطلاعات موقت کاربران
     user_data = {}
 
     # =====================================
@@ -68,9 +68,21 @@ def register_workshops_handler(bot: TeleBot):
 
         bot.send_message(
             message.chat.id,
+
             "🖼 بوتکمپ پردازش تصویر کاربردی\n\n"
-            "برای شرکت در این بوتکمپ، "
-            "دکمه ثبت‌نام را انتخاب کنید.",
+
+            "شما در حال پیش‌ثبت‌نام در بوتکمپ پردازش "
+            "تصویر کاربردی هستید.\n\n"
+
+            "برای آشنایی بیشتر با محتوای دوره، شیوهٔ "
+            "برگزاری و فضای آموزشی آن، جلسهٔ اول "
+            "به‌صورت رایگان برگزار می‌شود تا بتوانید "
+            "پیش از تصمیم‌گیری برای ادامهٔ دوره، "
+            "با جزئیات آن بیشتر آشنا شوید.\n\n"
+
+            "برای آغاز فرایند پیش‌ثبت‌نام، "
+            "دکمهٔ «پیش‌ثبت‌نام بوتکمپ» را انتخاب کنید.",
+
             reply_markup=workshop_registration_menu()
         )
 
@@ -80,7 +92,7 @@ def register_workshops_handler(bot: TeleBot):
 
     @bot.message_handler(
         func=lambda message:
-        message.text == "🔙 بازگشت به فهرست دوره‌ها"
+        message.text == "🔙 بازگشت به فهرست کارگاه‌ها"
     )
     def back_to_workshops(message):
 
@@ -104,7 +116,7 @@ def register_workshops_handler(bot: TeleBot):
 
             bot.send_message(
                 message.chat.id,
-                "درخواست ثبت‌نام شما لغو شد.",
+                "درخواست پیش‌ثبت‌نام شما لغو شد.",
                 reply_markup=main_menu()
             )
 
@@ -113,11 +125,13 @@ def register_workshops_handler(bot: TeleBot):
         return False
 
     # =====================================
-    # شروع ثبت نام
+    # شروع پیش ثبت نام بوتکمپ
     # =====================================
 
     @bot.message_handler(
-        func=lambda message: message.text == "📝 ثبت‌نام"
+        func=lambda message:
+        message.text == "📝 پیش‌ثبت‌نام بوتکمپ"
+        and message.chat.type == "private"
     )
     def start_registration(message):
 
@@ -133,7 +147,7 @@ def register_workshops_handler(bot: TeleBot):
 
         sent = bot.send_message(
             message.chat.id,
-            "📝 ثبت‌نام بوتکمپ پردازش تصویر کاربردی\n\n"
+            "📝 پیش‌ثبت‌نام بوتکمپ پردازش تصویر کاربردی\n\n"
             "لطفاً نام و نام خانوادگی خود را وارد کنید:",
             reply_markup=workshop_cancel_menu()
         )
@@ -164,7 +178,6 @@ def register_workshops_handler(bot: TeleBot):
 
         full_name = message.text.strip()
 
-        # بررسی کاراکترهای مجاز
         valid_characters = all(
             char.isalpha()
             or char.isspace()
@@ -172,7 +185,6 @@ def register_workshops_handler(bot: TeleBot):
             for char in full_name
         )
 
-        # بررسی وجود حداقل دو بخش نام
         name_parts = full_name.replace(
             "\u200c", " "
         ).split()
@@ -252,39 +264,51 @@ def register_workshops_handler(bot: TeleBot):
     )
     def receive_student_status(call):
 
-        bot.answer_callback_query(call.id)
-
         user_id = call.from_user.id
         chat_id = call.message.chat.id
 
-        # فقط در گفتگوی خصوصی
         if call.message.chat.type != "private":
+            bot.answer_callback_query(call.id)
             return
 
         if user_id != chat_id:
+            bot.answer_callback_query(call.id)
             return
 
         if user_id not in user_data:
+            bot.answer_callback_query(
+                call.id,
+                "این درخواست دیگر معتبر نیست."
+            )
             return
 
-        # جلوگیری از پردازش مجدد پاسخ
         if user_data[user_id]["is_student"] is not None:
+            bot.answer_callback_query(
+                call.id,
+                "پاسخ شما قبلاً ثبت شده است."
+            )
             return
 
-        # انصراف
+        bot.answer_callback_query(call.id)
+
         if call.data == "workshop_student_cancel":
 
             user_data.pop(user_id, None)
 
+            bot.edit_message_reply_markup(
+                chat_id,
+                call.message.message_id,
+                reply_markup=None
+            )
+
             bot.send_message(
                 chat_id,
-                "درخواست ثبت‌نام شما لغو شد.",
+                "درخواست پیش‌ثبت‌نام شما لغو شد.",
                 reply_markup=main_menu()
             )
 
             return
 
-        # پاسخ بله
         if call.data == "workshop_student_yes":
 
             user_data[user_id]["is_student"] = True
@@ -300,7 +324,6 @@ def register_workshops_handler(bot: TeleBot):
                 receive_student_id
             )
 
-        # پاسخ خیر
         else:
 
             user_data[user_id]["is_student"] = False
@@ -327,7 +350,6 @@ def register_workshops_handler(bot: TeleBot):
             else ""
         )
 
-        # فقط عدد و عدم یکسان بودن تمام ارقام
         if (
             not student_id.isdigit()
             or len(set(student_id)) == 1
@@ -408,7 +430,6 @@ def register_workshops_handler(bot: TeleBot):
 
             return
 
-        # بررسی اینکه شماره متعلق به خود کاربر باشد
         if (
             contact.user_id is not None
             and contact.user_id != user_id
@@ -430,7 +451,6 @@ def register_workshops_handler(bot: TeleBot):
 
         user_data[user_id]["phone"] = contact.phone_number
 
-        # اگر دانشجو باشد، دانشگاه دریافت می شود
         if user_data[user_id]["is_student"]:
 
             ask_university(message.chat.id)
@@ -440,7 +460,7 @@ def register_workshops_handler(bot: TeleBot):
             finish_registration(message)
 
     # =====================================
-    # درخواست انتخاب دانشگاه
+    # انتخاب دانشگاه
     # =====================================
 
     def ask_university(chat_id):
@@ -494,7 +514,6 @@ def register_workshops_handler(bot: TeleBot):
 
             return
 
-        # اگر سایر انتخاب شد
         if university == "سایر":
 
             sent = bot.send_message(
@@ -550,7 +569,7 @@ def register_workshops_handler(bot: TeleBot):
         finish_registration(message)
 
     # =====================================
-    # تکمیل و ارسال ثبت نام
+    # تکمیل و ارسال اطلاعات
     # =====================================
 
     def finish_registration(message):
@@ -577,10 +596,9 @@ def register_workshops_handler(bot: TeleBot):
         )
 
         admin_message = (
-            "📝 ثبت‌نام جدید بوتکمپ پردازش تصویر کاربردی\n\n"
+            "📝 پیش‌ثبت‌نام جدید بوتکمپ پردازش تصویر کاربردی\n\n"
 
-            f"👤 نام و نام خانوادگی: "
-            f"{data['full_name']}\n"
+            f"👤 نام و نام خانوادگی: {data['full_name']}\n"
 
             f"🎓 دانشجو: {student_status}\n"
 
@@ -608,24 +626,21 @@ def register_workshops_handler(bot: TeleBot):
 
             bot.send_message(
                 message.chat.id,
-                "❌ متأسفانه هنگام ارسال اطلاعات "
-                "مشکلی پیش آمد.\n"
+                "❌ هنگام ارسال اطلاعات مشکلی پیش آمد.\n"
                 "لطفاً کمی بعد دوباره تلاش کنید.",
                 reply_markup=main_menu()
             )
 
             user_data.pop(user_id, None)
-
             return
 
-        # حذف اطلاعات موقت
         user_data.pop(user_id, None)
 
         bot.send_message(
             message.chat.id,
-            "🎉 ثبت‌نام شما با موفقیت انجام شد!\n\n"
+            "🎉 پیش‌ثبت‌نام شما با موفقیت انجام شد!\n\n"
             "اطلاعات شما برای مسئول ثبت‌نام ارسال شد.\n\n"
-            "از حضور شما در بوتکمپ پردازش تصویر کاربردی "
-            "سپاسگزاریم.",
+            "از علاقه‌مندی شما به بوتکمپ پردازش تصویر "
+            "کاربردی سپاسگزاریم.",
             reply_markup=main_menu()
         )
