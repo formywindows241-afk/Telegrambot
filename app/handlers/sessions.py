@@ -71,6 +71,27 @@ SESSIONS = {
 💰 شرکت در نشست رایگان است.""",
 
         "poster": "Third_session.jpg",
+        "registration_open": False,
+        "report_url": "https://t.me/yazd_ce_pm/1171?single",
+    },
+
+    "fourth_session": {
+        "title": "💻 سیری در جهان کامپیوتر | فصل دوم، جلسه چهارم",
+
+        "text": """🟢 مسیر ورود به فناوری‌های پیشرفته و فرصت‌های شغلی این حوزه چطور شکل می‌گیره؟ آیا برای فعالیت در این زمینه‌ها باید به سیلیکون‌ولی رفت؟
+
+🔵 در چهارمین جلسه از فصل دوم مجموعه‌نشست‌های «سیری در جهان کامپیوتر»، گفت‌وگویی متفاوت با حضور دو مهمان از دنیای دانشگاه و صنعت خواهیم داشت.
+
+🟢 در این نشست درباره تأثیر هوش مصنوعی بر آینده مهندسی کامپیوتر، مسیر ورود به بازار کار، تجربه‌های دانشگاهی و صنعتی و چگونگی ایجاد تعادل میان یادگیری دانشگاهی و کسب تجربه عملی گفت‌وگو می‌کنیم.
+
+🎙️ میزبان دکتر علی‌محمد لطیف، عضو هیئت علمی دانشگاه یزد، و مهندس حمیدرضا جعفریان‌مقدم، مدیرعامل شرکت رایانش ابری آوید هستیم تا این موضوعات را از نگاه دانشگاه و صنعت بررسی کنیم.
+
+📅 پنجشنبه، ۱۲ آذر ۱۴۰۵
+⏰ ساعت ۹ تا ۱۱
+📍 دانشگاه یزد، دانشکده منابع طبیعی، سالن منتظر قائم
+💰 شرکت در نشست رایگان است.""",
+
+        "poster": "session_four.jpg",
         "registration_open": True,
         "report_url": None,
     },
@@ -100,6 +121,11 @@ UNIVERSITIES = [
     "دانشگاه علم و هنر",
     "سایر",
 ]
+
+
+# متن سؤال پایانی ثبت‌نام
+# برای تغییر سؤال، فقط همین مقدار را ویرایش کنید.
+FINAL_QUESTION = "دغدغه‌ی شما برای کار چیه؟ چه چیزی رو از محیط کار می‌خواید؟"
 
 
 selected_sessions = {}
@@ -476,7 +502,7 @@ def register_sessions_handler(bot: TeleBot):
 
         registration_data[user_id]["university"] = university
 
-        send_registration_to_admin(message, session_id)
+        ask_final_question(message, session_id)
 
     # دریافت نام دانشگاه سایر
     def get_other_university(message, session_id):
@@ -501,6 +527,43 @@ def register_sessions_handler(bot: TeleBot):
         registration_data[user_id]["university"] = (
             message.text.strip()
         )
+
+        ask_final_question(message, session_id)
+
+    # دریافت دغدغه کاربر درباره محیط کار
+    def ask_final_question(message, session_id):
+        bot.send_message(
+            message.chat.id,
+            FINAL_QUESTION,
+            reply_markup=session_cancel_menu(),
+        )
+
+        bot.register_next_step_handler(
+            message,
+            get_final_answer,
+            session_id,
+        )
+
+    def get_final_answer(message, session_id):
+        user_id = message.from_user.id
+
+        if is_cancel(message):
+            return
+
+        if not message.text or not message.text.strip():
+            bot.send_message(
+                message.chat.id,
+                "لطفاً پاسخ خود را به‌صورت متنی وارد کنید:",
+                reply_markup=session_cancel_menu(),
+            )
+            bot.register_next_step_handler(
+                message,
+                get_final_answer,
+                session_id,
+            )
+            return
+
+        registration_data[user_id]["work_concern"] = message.text.strip()
 
         send_registration_to_admin(message, session_id)
 
@@ -527,6 +590,7 @@ def register_sessions_handler(bot: TeleBot):
             else "ندارد"
         )
 
+        # پیام اول: اطلاعات معمول ثبت‌نام، با همان قالب قبلی
         admin_message = (
             "🎙️ ثبت‌نام جدید در نشست علمی\n\n"
             f"📌 عنوان نشست: {session['title']}\n"
@@ -539,13 +603,26 @@ def register_sessions_handler(bot: TeleBot):
             f"🏛 دانشگاه: {data['university']}"
         )
 
+        # پیام دوم: فقط پاسخ سؤال پایانی
+        concern_message = (
+            "💬 دغدغه شما برای کار:\n\n"
+            f"{data['work_concern']}"
+        )
+
         try:
             if not ADMIN_ID:
                 raise ValueError("ADMIN_ID تنظیم نشده است.")
 
+            # ارسال پیام اول
             bot.send_message(
                 ADMIN_ID,
                 admin_message,
+            )
+
+            # ارسال پیام دوم
+            bot.send_message(
+                ADMIN_ID,
+                concern_message,
             )
 
         except Exception as error:
@@ -553,7 +630,7 @@ def register_sessions_handler(bot: TeleBot):
 
             bot.send_message(
                 message.chat.id,
-                "❌ ثبت‌نام انجام نشد. لطفاً بعداً دوباره تلاش کنید.",
+                "❌ ارسال اطلاعات ثبت‌نام با مشکل مواجه شد. لطفاً بعداً دوباره تلاش کنید.",
                 reply_markup=main_menu(),
             )
 
