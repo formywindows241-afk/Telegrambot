@@ -15,7 +15,7 @@ def register_active_events_handler(bot: TeleBot):
     def show_active_events(message):
         bot.send_message(
             message.chat.id,
-            "🟢 رویدادهای فعال انجمن\\n\\n"
+            "🟢 رویدادهای فعال انجمن\n\n"
             "لطفاً رویداد موردنظر خود را انتخاب کنید:",
             reply_markup=active_events_menu(),
         )
