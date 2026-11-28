@@ -5,8 +5,8 @@ from telebot import TeleBot
 
 from app.config import ADMIN_ID
 from app.keyboards.main_menu import main_menu
+from app.keyboards.events_menu import active_events_menu
 from app.keyboards.sessions_menu import (
-    sessions_menu,
     session_details_menu,
     session_cancel_menu,
     session_phone_menu,
@@ -16,86 +16,32 @@ from app.keyboards.sessions_menu import (
 )
 
 
-SESSIONS = {
-    "first_session": {
-        "title": "💻 سیری در جهان کامپیوتر | فصل دوم، جلسه اول",
+SESSIONS = {'fourth_session': {'title': '💻 سیری در جهان کامپیوتر | فصل دوم، جلسه چهارم',
+                    'text': '🟢 مسیر ورود به فناوری\u200cهای پیشرفته و فرصت\u200cهای شغلی این حوزه '
+                            'چطور شکل می\u200cگیره؟ آیا برای فعالیت در این زمینه\u200cها باید به '
+                            'سیلیکون\u200cولی رفت؟\n'
+                            '\n'
+                            '🔵 در چهارمین جلسه از فصل دوم مجموعه\u200cنشست\u200cهای «سیری در جهان '
+                            'کامپیوتر»، گفت\u200cوگویی متفاوت با حضور دو مهمان از دنیای دانشگاه و '
+                            'صنعت خواهیم داشت.\n'
+                            '\n'
+                            '🟢 در این نشست درباره تأثیر هوش مصنوعی بر آینده مهندسی کامپیوتر، مسیر '
+                            'ورود به بازار کار، تجربه\u200cهای دانشگاهی و صنعتی و چگونگی ایجاد '
+                            'تعادل میان یادگیری دانشگاهی و کسب تجربه عملی گفت\u200cوگو '
+                            'می\u200cکنیم.\n'
+                            '\n'
+                            '🎙️ میزبان دکتر علی\u200cمحمد لطیف، عضو هیئت علمی دانشگاه یزد، و مهندس '
+                            'حمیدرضا جعفریان\u200cمقدم، مدیرعامل شرکت رایانش ابری آوید هستیم تا '
+                            'این موضوعات را از نگاه دانشگاه و صنعت بررسی کنیم.\n'
+                            '\n'
+                            '📅 پنجشنبه، ۱۲ آذر ۱۴۰۵\n'
+                            '⏰ ساعت ۹ تا ۱۱\n'
+                            '📍 دانشگاه یزد، دانشکده منابع طبیعی، سالن منتظر قائم\n'
+                            '💰 شرکت در نشست رایگان است.',
+                    'poster': 'session_four.jpg',
+                    'registration_open': True,
+                    'report_url': None}}
 
-        "text": """🟢 چقدر با مسیر واقعی ورود به دنیای هوش مصنوعی آشنایی داری؟
-
-🔵 در اولین جلسه از فصل دوم مجموعه‌نشست‌های «سیری در جهان کامپیوتر»، میزبان آقای پوریا اعظمی، متخصص حوزه هوش مصنوعی و پردازش تصویر هستیم تا درباره تجربه‌ها، مسیر تخصصی و دنیای این فناوری گفت‌وگو کنیم.
-
-🟢 این نشست فرصتی برای گفت‌وگویی دوطرفه، پرسش و پاسخ و آشنایی با تجربه‌های عملی در حوزه هوش مصنوعی است.
-
-📅 پنجشنبه، ۲۳ مهر
-⏰ ساعت ۱۰ تا ۱۱:۳۰
-📍 دانشگاه یزد، دانشکده منابع طبیعی، سالن منتظر قائم
-💰 شرکت در نشست رایگان است.""",
-
-        "poster": "first_session.jpg",
-        "registration_open": False,
-        "report_url": "https://t.me/yazd_ce_pm/1096",
-    },
-
-    "second_session": {
-        "title": "💻 سیری در جهان کامپیوتر | فصل دوم، جلسه دوم",
-
-        "text": """🟢 دنیای امروز بیش از هر زمان دیگری به شبکه‌ها و فناوری‌های دیجیتال وابسته شده؛ اما چقدر با چالش‌های امنیتی این دنیای به‌هم‌پیوسته آشنایی داریم؟
-
-🔵 در دومین جلسه از فصل دوم مجموعه‌نشست‌های «سیری در جهان کامپیوتر»، میزبان استادی از حوزه مهندسی کامپیوتر با تخصص در شبکه‌های کامپیوتری و امنیت سایبری هستیم.
-
-🟢 در این نشست درباره امنیت شبکه، تحول دیجیتال، فناوری‌های نوظهور و تجربه‌های صنعتی گفت‌وگو خواهیم کرد.
-
-📅 پنجشنبه، ۲۳ مهر
-⏰ ساعت ۱۰ تا ۱۱:۳۰
-📍 دانشگاه یزد، دانشکده منابع طبیعی، سالن منتظر قائم
-💰 شرکت در نشست رایگان است.""",
-
-        "poster": "second_session.jpg",
-        "registration_open": False,
-        "report_url": "https://t.me/yazd_ce_pm/1134",
-    },
-
-    "third_session": {
-        "title": "💻 سیری در جهان کامپیوتر | فصل دوم، جلسه سوم",
-
-        "text": """🟢 دنیای مهندسی نرم‌افزار پر از ایده‌هایی است که می‌تونن به محصولات و راهکارهای کاربردی تبدیل بشن؛ اما مسیر تبدیل یک ایده به محصول واقعی چطوریه؟
-
-🔵 در سومین جلسه از فصل دوم مجموعه‌نشست‌های «سیری در جهان کامپیوتر»، میزبان دکتر فرزاد نیازمند، مهندس نرم‌افزار، مدیر ارشد فنی و هم‌بنیان‌گذار شرکت امید نیک هستیم.
-
-🟢 در این نشست درباره تجربه‌های صنعتی، مدیریت تیم‌های توسعه نرم‌افزاری و مسیر تبدیل ایده‌ها به محصولات واقعی گفت‌وگو خواهیم کرد.
-
-📅 پنجشنبه، ۲۸ آبان ۱۴۰۵
-⏰ ساعت ۱۰ تا ۱۲
-📍 دانشگاه یزد، دانشکده منابع طبیعی، سالن دکتر جزیره‌ای
-
-💰 شرکت در نشست رایگان است.""",
-
-        "poster": "Third_session.jpg",
-        "registration_open": False,
-        "report_url": "https://t.me/yazd_ce_pm/1171?single",
-    },
-
-    "fourth_session": {
-        "title": "💻 سیری در جهان کامپیوتر | فصل دوم، جلسه چهارم",
-
-        "text": """🟢 مسیر ورود به فناوری‌های پیشرفته و فرصت‌های شغلی این حوزه چطور شکل می‌گیره؟ آیا برای فعالیت در این زمینه‌ها باید به سیلیکون‌ولی رفت؟
-
-🔵 در چهارمین جلسه از فصل دوم مجموعه‌نشست‌های «سیری در جهان کامپیوتر»، گفت‌وگویی متفاوت با حضور دو مهمان از دنیای دانشگاه و صنعت خواهیم داشت.
-
-🟢 در این نشست درباره تأثیر هوش مصنوعی بر آینده مهندسی کامپیوتر، مسیر ورود به بازار کار، تجربه‌های دانشگاهی و صنعتی و چگونگی ایجاد تعادل میان یادگیری دانشگاهی و کسب تجربه عملی گفت‌وگو می‌کنیم.
-
-🎙️ میزبان دکتر علی‌محمد لطیف، عضو هیئت علمی دانشگاه یزد، و مهندس حمیدرضا جعفریان‌مقدم، مدیرعامل شرکت رایانش ابری آوید هستیم تا این موضوعات را از نگاه دانشگاه و صنعت بررسی کنیم.
-
-📅 پنجشنبه، ۱۲ آذر ۱۴۰۵
-⏰ ساعت ۹ تا ۱۱
-📍 دانشگاه یزد، دانشکده منابع طبیعی، سالن منتظر قائم
-💰 شرکت در نشست رایگان است.""",
-
-        "poster": "session_four.jpg",
-        "registration_open": True,
-        "report_url": None,
-    },
-}
 
 
 ASSETS_PATH = Path(__file__).resolve().parents[1] / "assets"
@@ -134,20 +80,6 @@ registration_data = {}
 
 def register_sessions_handler(bot: TeleBot):
 
-    # نمایش فهرست نشست‌ها
-    @bot.message_handler(
-        func=lambda message: (
-            message.text is not None
-            and message.text.strip() == "🎙️ نشست‌های علمی"
-        )
-    )
-    def show_sessions(message):
-        bot.send_message(
-            message.chat.id,
-            "🎙️ لطفاً نشست موردنظر خود را انتخاب کنید:",
-            reply_markup=sessions_menu(list(SESSIONS.values())),
-        )
-
     # نمایش اطلاعات نشست انتخاب‌شده
     @bot.message_handler(
         func=lambda message: (
@@ -178,7 +110,7 @@ def register_sessions_handler(bot: TeleBot):
             bot.send_message(
                 message.chat.id,
                 "❌ نشست موردنظر پیدا نشد.",
-                reply_markup=sessions_menu(list(SESSIONS.values())),
+                reply_markup=active_events_menu(),
             )
             return
 
@@ -220,42 +152,23 @@ def register_sessions_handler(bot: TeleBot):
                 reply_markup=session_details_menu(),
             )
 
-    # بازگشت به منوی اصلی
+    # بازگشت از جزئیات نشست به فهرست رویدادهای فعال
     @bot.message_handler(
         func=lambda message: (
             message.text is not None
-            and message.text.strip() == "🔙 بازگشت به منوی اصلی"
+            and message.text.strip() == "🔙 بازگشت به رویدادهای فعال"
         )
     )
-    def back_to_main(message):
+    def back_to_active_events(message):
         user_id = message.from_user.id
-
         selected_sessions.pop(user_id, None)
         registration_data.pop(user_id, None)
 
         bot.send_message(
             message.chat.id,
-            "به منوی اصلی برگشتید.",
-            reply_markup=main_menu(),
-        )
-
-    # بازگشت به فهرست نشست‌ها
-    @bot.message_handler(
-        func=lambda message: (
-            message.text is not None
-            and message.text.strip() == "🔙 بازگشت به نشست‌های علمی"
-        )
-    )
-    def back_to_sessions(message):
-        user_id = message.from_user.id
-
-        selected_sessions.pop(user_id, None)
-        registration_data.pop(user_id, None)
-
-        bot.send_message(
-            message.chat.id,
-            "🎙️ لطفاً نشست موردنظر خود را انتخاب کنید:",
-            reply_markup=sessions_menu(list(SESSIONS.values())),
+            "🟢 رویدادهای فعال انجمن\\n\\n"
+            "لطفاً رویداد موردنظر خود را انتخاب کنید:",
+            reply_markup=active_events_menu(),
         )
 
     # شروع ثبت‌نام

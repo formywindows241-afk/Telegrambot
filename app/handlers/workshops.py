@@ -8,9 +8,9 @@ from telebot.types import (
 from app.config import ADMIN_ID
 
 from app.keyboards.main_menu import main_menu
+from app.keyboards.events_menu import active_events_menu
 
 from app.keyboards.workshops_menu import (
-    workshops_menu,
     workshop_registration_menu,
     workshop_cancel_menu,
     workshop_contact_menu,
@@ -23,37 +23,17 @@ def register_workshops_handler(bot: TeleBot):
     # اطلاعات موقت کاربران
     user_data = {}
 
-    # =====================================
-    # منوی کارگاه ها
-    # =====================================
-
+    # بازگشت به رویدادهای فعال
     @bot.message_handler(
-        func=lambda message: message.text == "🛠 کارگاه‌ها"
+        func=lambda message: message.text == "🔙 بازگشت به رویدادهای فعال"
     )
-    def workshops(message):
-
-        bot.send_message(
-            message.chat.id,
-            "🛠 به بخش کارگاه‌ها خوش آمدید.\n\n"
-            "لطفاً کارگاه موردنظر خود را انتخاب کنید:",
-            reply_markup=workshops_menu()
-        )
-
-    # =====================================
-    # بازگشت به منوی اصلی
-    # =====================================
-
-    @bot.message_handler(
-        func=lambda message: message.text == "🔙 منوی اصلی"
-    )
-    def back_to_main(message):
-
+    def back_to_active_events(message):
         user_data.pop(message.from_user.id, None)
-
         bot.send_message(
             message.chat.id,
-            "به منوی اصلی بازگشتید.",
-            reply_markup=main_menu()
+            "🟢 رویدادهای فعال انجمن\\n\\n"
+            "لطفاً رویداد موردنظر خود را انتخاب کنید:",
+            reply_markup=active_events_menu()
         )
 
     # =====================================
@@ -87,24 +67,6 @@ def register_workshops_handler(bot: TeleBot):
             "دکمهٔ «پیش‌ثبت‌نام بوتکمپ» را انتخاب کنید.",
 
             reply_markup=workshop_registration_menu()
-        )
-
-    # =====================================
-    # بازگشت به فهرست کارگاه ها
-    # =====================================
-
-    @bot.message_handler(
-        func=lambda message:
-        message.text == "🔙 بازگشت به فهرست کارگاه‌ها"
-    )
-    def back_to_workshops(message):
-
-        user_data.pop(message.from_user.id, None)
-
-        bot.send_message(
-            message.chat.id,
-            "لطفاً کارگاه موردنظر خود را انتخاب کنید:",
-            reply_markup=workshops_menu()
         )
 
     # =====================================

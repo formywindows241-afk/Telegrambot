@@ -1,20 +1,10 @@
 from telebot.types import ReplyKeyboardMarkup, KeyboardButton
 
 
-def sessions_menu(sessions):
-    keyboard = ReplyKeyboardMarkup(resize_keyboard=True)
-
-    for session in sessions:
-        keyboard.row(KeyboardButton(session["title"]))
-
-    keyboard.row(KeyboardButton("🔙 بازگشت به منوی اصلی"))
-    return keyboard
-
-
 def session_details_menu():
     keyboard = ReplyKeyboardMarkup(resize_keyboard=True)
     keyboard.row(KeyboardButton("📝 ثبت‌نام"))
-    keyboard.row(KeyboardButton("🔙 بازگشت به نشست‌های علمی"))
+    keyboard.row(KeyboardButton("🔙 بازگشت به رویدادهای فعال"))
     return keyboard
 
 
